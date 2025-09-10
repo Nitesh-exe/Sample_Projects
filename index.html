@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bharat Pashudhan — Breed Recognizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50">
+  <div class="max-w-5xl mx-auto p-6">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Bharat Pashudhan — Breed Recognizer</h1>
+        <p class="text-sm text-slate-500">
+          Image-based assistance for FLWs to identify cattle & buffalo breeds during registration
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="openBreedDB" class="btn-secondary">Breed Database</button>
+        <a href="#integration" class="btn-primary">Integration Guide</a>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Image input + results -->
+      <section class="md:col-span-2 card">
+        <div class="flex flex-col md:flex-row gap-4">
+          <!-- Upload & Camera -->
+          <div class="flex-1 border-dashed border-2 border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-4">
+            <img id="previewImg" class="max-h-72 object-contain rounded-lg hidden" />
+            <div id="placeholder" class="text-center text-slate-500">
+              <div class="text-4xl mb-2">📸</div>
+              <div class="font-medium">Upload or capture an animal image</div>
+              <div class="text-xs mt-1">Tip: capture full body or clear head profile under good light</div>
+            </div>
+
+            <div class="flex gap-3 mt-3 flex-wrap">
+              <input id="fileInput" type="file" accept="image/*" class="hidden" />
+              <button id="uploadBtn" class="btn-secondary">Upload Image</button>
+              <button id="cameraBtn" class="btn-secondary">Open Camera</button>
+              <button id="analyzeBtn" class="btn-success">Analyze</button>
+            </div>
+
+            <div class="w-full mt-3 hidden" id="cameraBox">
+              <video id="video" class="w-full rounded-lg bg-black" playsinline muted></video>
+              <canvas id="canvas" class="hidden"></canvas>
+              <div class="mt-2 flex gap-2">
+                <button id="captureBtn" class="btn-secondary">Capture</button>
+                <button id="stopBtn" class="btn-secondary">Stop</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side info -->
+          <aside class="w-80 flex flex-col gap-3">
+            <div class="card">
+              <div class="font-semibold">Image Quality Checker</div>
+              <ul class="mt-3 text-xs text-slate-600 space-y-1">
+                <li>• Detects low light / blur (client-side)</li>
+                <li>• Suggests re-capture angle (head, profile, full body)</li>
+              </ul>
+            </div>
+
+            <div class="card text-xs text-slate-600">
+              <div class="text-sm text-slate-500">Image Metadata</div>
+              <div class="mt-2">Source: <span class="font-medium">BPA-FLW-App</span></div>
+              <div class="mt-1">Location: <span class="font-medium">(GPS from device)</span></div>
+            </div>
+
+            <div class="card">
+              <div class="text-sm text-slate-500">Guidance</div>
+              <ol class="mt-2 text-xs list-decimal list-inside space-y-1 text-slate-600">
+                <li>Capture at animal eye-level.</li>
+                <li>Avoid heavy shadows.</li>
+                <li>Include whole animal.</li>
+              </ol>
+            </div>
+          </aside>
+        </div>
+
+        <!-- Results -->
+        <div id="resultBox" class="mt-5 text-sm text-slate-400">
+          No analysis yet — upload or capture an image and click Analyze.
+        </div>
+      </section>
+
+      <!-- Right column -->
+      <aside class="hidden md:block">
+        <div class="sticky top-6 flex flex-col gap-4">
+          <div class="card">
+            <div class="text-sm text-slate-500">Breed Lookup</div>
+            <input placeholder="Search breed name" class="w-full p-2 mt-2 border rounded-lg text-sm" />
+          </div>
+          <div class="card">
+            <div class="text-sm text-slate-500">Offline Mode</div>
+            <button class="mt-3 btn-secondary">Download offline pack</button>
+          </div>
+          <div class="card">
+            <div class="text-sm text-slate-500">Feedback</div>
+            <button class="mt-3 btn-secondary">View flagged items</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Breed DB Modal -->
+    <div id="breedDB" class="modal hidden">
+      <div class="modal-content">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Breed Database</h3>
+          <button id="closeBreedDB" class="btn-secondary">Close</button>
+        </div>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-auto text-sm">
+          <div class="border rounded-xl p-3"><b>Holstein Friesian</b><br><span class="text-xs text-slate-500">Cattle • Imported</span></div>
+          <div class="border rounded-xl p-3"><b>Murrah</b><br><span class="text-xs text-slate-500">Buffalo • Haryana</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Integration -->
+    <section id="integration" class="mt-8 card">
+      <h4 class="font-semibold">Integration & Developer Notes</h4>
+      <ol class="mt-2 text-sm list-decimal list-inside space-y-1">
+        <li>Expose a secure backend endpoint.</li>
+        <li>Attach GPS, timestamp, and FLW id with each request.</li>
+        <li>Queue requests locally in offline mode.</li>
+        <li>Keep UI simple with big buttons.</li>
+        <li>Provide offline inference models.</li>
+      </ol>
+      <pre class="mt-2 text-xs bg-slate-100 p-3 rounded">{
+  "breed": "Murrah",
+  "confidence": 0.93,
+  "type": "Buffalo"
+}</pre>
+    </section>
+
+    <footer class="mt-6 text-xs text-slate-500">
+      Designed for quick adoption by FLWs — accessible, minimal, and integratable.
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
